@@ -1,0 +1,63 @@
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: spring-ingress
+  labels:
+    app: spring-ingress
+  annotations:
+    kubernetes.io/ingress.class: "nginx"
+    #nginx.ingress.kubernetes.io/rewrite-target: /
+    nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    nginx.ingress.kubernetes.io/proxy-redirect-from: "default"
+    nginx.ingress.kubernetes.io/configuration-snippet: |
+      #proxy_redirect https://local.io:80 https://local.io:8083;
+      #proxy_redirect http://local.io:443 https://local.io:8083;
+      #proxy_set_header X-Forwarded-Port "443";
+      #proxy_redirect ~^(https://[^:]+):\.+)$ https://$http_host$1/hello;
+spec:
+  #  tls:
+  #    - hosts:
+  #      -  "*.local.io"
+  #      secretName: "local.io"
+  rules:
+    - host: default.local.io
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: spring-default
+                port:
+                  number: 8080
+    - host: native.local.io
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: spring-native
+                port:
+                  number: 8080
+    - host: framework.local.io
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: spring-framework
+                port:
+                  number: 8080
+    - host: relative.local.io
+      http:
+        paths:
+          - path: /
+            pathType: ImplementationSpecific
+            backend:
+              service:
+                name: spring-relative
+                port:
+                  number: 8080
